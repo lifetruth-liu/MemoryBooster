@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>内存加速工具 v2.1 · 使用文档（仿微软电脑管家）</title>
+<style>
+:root{
+  --bg:#ffffff; --soft:#f8fafc; --side:#fbfcfd;
+  --text:#1e293b; --dim:#64748b; --line:#e5e9f0;
+  --brand:#4f46e5; --brand-soft:#eef2ff; --accent:#0d9488;
+  --code-bg:#1b2434;
+  --mono:"JetBrains Mono","Cascadia Code",Consolas,monospace;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  font-family:-apple-system,"PingFang SC","Microsoft YaHei",Segoe UI,sans-serif;
+  font-size:15.5px;line-height:1.78;color:var(--text);background:var(--bg);
+}
+#layout{display:flex;min-height:100vh}
+aside{
+  width:282px;flex:0 0 282px;background:var(--side);border-right:1px solid var(--line);
+  position:fixed;top:0;bottom:0;left:0;overflow-y:auto;padding:26px 18px;
+}
+aside .logo{display:flex;align-items:center;gap:9px;font-size:17px;font-weight:800;color:var(--brand);margin-bottom:4px}
+aside .logo img{width:26px;height:26px;border-radius:7px}
+aside .sub{font-size:12px;color:var(--dim);margin-bottom:18px}
+#toc a{display:block;color:var(--dim);text-decoration:none;font-size:13.5px;
+  padding:6px 10px;border-radius:7px;transition:.15s}
+#toc a:hover{background:var(--brand-soft);color:var(--brand)}
+#toc a.lv3{padding-left:24px;font-size:12.5px}
+#toc a.active{background:var(--brand-soft);color:var(--brand);font-weight:700}
+main{margin-left:282px;max-width:960px;padding:56px 64px;flex:1}
+h1{font-size:28px;margin:0 0 6px;letter-spacing:-.5px}
+h2{font-size:21px;margin:42px 0 14px;padding-top:18px;border-top:1px solid var(--line);
+  scroll-margin-top:20px;color:#0f172a}
+h3{font-size:16.5px;margin:24px 0 10px;scroll-margin-top:20px;color:#1e293b}
+p{margin:10px 0}
+code:not(pre code){background:#eef2ff;color:#4338ca;padding:1px 6px;border-radius:5px;
+  font-family:var(--mono);font-size:13px}
+pre{margin:14px 0;border-radius:10px;background:var(--code-bg);padding:16px 18px;overflow:auto}
+pre code{font-family:var(--mono);font-size:13px;color:#cbd5e1;background:none;padding:0}
+.code-wrap{position:relative}
+.copy{position:absolute;top:10px;right:10px;border:0;background:rgba(255,255,255,.12);
+  color:#cbd5e1;font-size:12px;padding:4px 10px;border-radius:6px;cursor:pointer}
+.copy:hover{background:rgba(255,255,255,.22)}
+.tw{overflow-x:auto;margin:14px 0}
+table{border-collapse:collapse;width:100%;font-size:14px}
+thead th{background:var(--brand-soft);color:#3730a3;text-align:left;padding:10px 12px;
+  border:1px solid var(--line);font-weight:700}
+tbody td{padding:9px 12px;border:1px solid var(--line)}
+tbody tr:nth-child(even){background:var(--soft)}
+tbody tr:hover{background:#f1f5f9}
+.box{border-radius:0 10px 10px 0;padding:14px 16px;margin:16px 0;border-left:5px solid}
+.box .bt{font-weight:700;margin-bottom:6px}
+.box.tip{border-color:var(--accent);background:#ecfdf8}
+.box.warn{border-color:#f59e0b;background:#fffbeb}
+.box.danger{border-color:#dc2626;background:#fef2f2}
+.box.info{border-color:var(--brand);background:var(--brand-soft)}
+figure{margin:18px 0;text-align:center}
+figcaption{font-size:12.5px;color:var(--dim);margin-top:8px}
+ul,ol{margin:10px 0;padding-left:22px}
+li{margin:5px 0}
+.check{list-style:none;padding-left:4px}
+.check li:before{content:"\2610 ";color:var(--brand);font-weight:700}
+.menu-btn{display:none}
+@media(max-width:1080px){
+  aside{transform:translateX(-100%);transition:.25s;z-index:20;width:260px}
+  aside.open{transform:translateX(0)}
+  main{margin-left:0;padding:24px 18px}
+  .menu-btn{display:block;position:fixed;top:12px;left:12px;z-index:30;background:var(--brand);
+    color:#fff;border:0;border-radius:8px;padding:8px 12px;font-size:14px;cursor:pointer}
+}
+/* 语法高亮配色 */
+.k{color:#c792ea}.s{color:#c3e88d}.c{color:#6b7a94;font-style:italic}
+.n{color:#f78c6c}.a{color:#89ddff}.l{color:#ffcb6b}
+</style>
+</head>
+<body>
+<div id="layout">
+<button class="menu-btn" onclick="document.querySelector('aside').classList.toggle('open')">&#9776; 目录</button>
+<aside>
+  <div class="logo"><img src="data:image/png;base64,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" alt="icon"> 内存加速工具</div>
+  <div class="sub">v2.1 · 仿微软电脑管家 · 使用文档</div>
+  <nav id="toc"></nav>
+</aside>
+<main id="main">
+
+<h1>内存加速工具 · 使用文档</h1>
+<p>一个 Windows 专用的小工具：手动点一下加速，或设个阈值让它后台自动加速（<b>每 5 分钟最多一次</b>）。原理和微软电脑管家的 Boost / Smart Boost 完全一致——都是套壳 Windows 自带 API。已打包为单文件 <code>MemoryBooster.exe</code>（<b>6.9 MB</b>），界面为纯 <code>tkinter</code> 自绘，<b>零第三方依赖</b>。</p>
+
+<div class="box danger">
+  <div class="bt">⚠ 先说最关键的局限</div>
+  本工具<b>回收不了「非分页池(Non-Paged Pool)」内核内存泄漏</b>。NPP 是内核态内存，用户态的 <code>EmptyWorkingSet</code> / 清缓存都碰不到它。如果机器上有驱动导致的 NPP 泄漏（比如常见的 ~8.5GB 泄漏），请用 RAMMap / poolmon 定位泄漏驱动，或重启。本工具能释放的是「备用缓存 + 可修剪的用户态工作集」，能缓解感知压力，但治不了 NPP 泄漏。
+</div>
+
+<h2 id="ch1">1. 原理：微软电脑管家到底怎么加速的</h2>
+<p>微软电脑管家的「加速」不是黑科技，本质是把 Windows 自带的内存管理 API 包了一层 UI。下面这张表把它的真实动作和本工具的实现一一对应：</p>
+
+<div class="tw"><table>
+<thead><tr><th>动作</th><th>微软电脑管家</th><th>本工具实现</th><th>需要权限</th></tr></thead>
+<tbody>
+<tr><td>修剪进程工作集</td><td>告诉后台进程释放不用的内存</td><td><code>SetProcessWorkingSetSize(pid,-1,-1)</code> 即 EmptyWorkingSet</td><td>管理员（其他用户/系统进程）</td></tr>
+<tr><td>清空备用/缓存内存</td><td>Trim standby memory（同重启效果）</td><td><code>NtSetSystemInformation(0x50, MemoryPurgeStandbyList)</code></td><td>SeProfileSingleProcessPrivilege</td></tr>
+<tr><td>清理临时文件</td><td>清除 Windows 临时文件夹</td><td>删 <code>%TEMP%</code> 下超过 7 天且未锁定的文件</td><td>当前用户</td></tr>
+<tr><td>智能加速</td><td>Smart Boost：超阈值自动跑</td><td>后台轮询 + 阈值判断 + 最小间隔节流</td><td>同上</td></tr>
+</tbody>
+</table></div>
+
+<div class="box info">
+  <div class="bt">结论</div>
+  它不改内核调度、不修驱动，释放出来的内存很快会被系统和应用重新占满，效果是<b>短暂回血</b>。所谓「加速」= 一次快速的重启级清理动作。
+</div>
+
+<h2 id="ch2">2. 界面：三个标签，400×496</h2>
+<p>窗口默认出现在<b>屏幕右下角</b>（按工作区计算、避开任务栏，距边 14px），固定尺寸 <b>400×496</b>，不可拉伸，支持深/浅色两套配色。顶部是三段标签，切换即时生效、无需确认。</p>
+
+<div class="tw"><table>
+<thead><tr><th>标签</th><th>内容</th><th>用在哪</th></tr></thead>
+<tbody>
+<tr><td><b>加速</b></td><td>圆环仪表 + 一键加速 + 上次结果三格（释放 / 修剪进程 / 临时文件）</td><td>日常手动清一下</td></tr>
+<tr><td><b>自动</b></td><td>自动加速开关、阈值模式与滑块、最小加速间隔</td><td>设一次阈值，之后不管</td></tr>
+<tr><td><b>设置</b></td><td>开机自启、关闭窗口行为、清临时文件、检测间隔、深浅色、退出</td><td>装完先配一遍</td></tr>
+</tbody>
+</table></div>
+
+<h3 id="ch2-1">加速页</h3>
+<ul>
+  <li><b>圆环</b>按占用率变色：&lt;70% 蓝、70~85% 橙、≥85% 红，中间直接显示百分比。</li>
+  <li><b>加速动效</b>：点下按钮后，圆环与中间数字在约 0.6 秒内<b>平滑涨到 100%</b>（并轻微「呼吸」表示还在干活）；加速完成时圆环再平滑回落到真实占用，按钮变绿显示「✓ 已释放 X.XX GB」，2.4 秒后自动复位成「一键加速」。整个过程只做增量重绘，界面不会闪。</li>
+  <li><b>三格统计</b>：本次释放量、修剪成功的进程数、清理的临时文件数。</li>
+</ul>
+
+<h3 id="ch2-2">清晰度、图标与动效实现</h3>
+<p>这几处是专门为「看着不糊」下的功夫，也解释了为什么界面小但不糊：</p>
+<div class="tw"><table>
+<thead><tr><th>问题</th><th>原因</th><th>做法</th></tr></thead>
+<tbody>
+<tr><td>整块界面发虚</td><td>只声明 System DPI 感知时，缩放≠100% 的屏幕会被系统把窗口<b>位图拉伸</b></td><td>改用 <b>Per-Monitor V2</b> DPI 感知（<code>SetProcessDpiAwarenessContext(-4)</code>），按真实像素绘制</td></tr>
+<tr><td>中文小字糊成一团</td><td>字号用「点」，换算成 12.7px 这类非整数值，笔画被摊到两个像素上</td><td>字号改用<b>像素</b>（Tk 的负数写法），且最小 11px；正文统一 12~15px</td></tr>
+<tr><td>圆角与边框毛糙</td><td>1px 的 polygon 描边在斜边上是硬锯齿</td><td>改成<b>双层填充</b>（外层描边色 + 内层留白），坐标全部 round 到整数像素</td></tr>
+<tr><td>满环时 12 点有豁口</td><td>Tk 画接近 360° 的弧，起终点对不齐</td><td>≥98% 时改用完整椭圆绘制，无缝</td></tr>
+</tbody>
+</table></div>
+<p><b>图标是内嵌的</b>：<code>app_icon.py</code> 里存着 zlib+base64 压缩的 ICO（16~256 共九档），运行时解压到临时目录供窗口与托盘使用。所以 exe 拷到任何路径都自带图标，<b>不需要 <code>assets</code> 目录</b>；exe 自身的资源段图标则在打包时写入。</p>
+
+<h3 id="ch2-3">自动页</h3>
+<ul>
+  <li>阈值两种模式，滑块直接拖：<b>按已用内存 GB</b>（2 GB ~ 总内存-1）或<b>按占用率 %</b>（50~95）。</li>
+  <li>滑块下方实时显示「当前已用 X GB，已超过 / 低于阈值」，方便判断阈值定得合不合适。</li>
+  <li><b>最小加速间隔</b> 1~15 分钟：自动触发的节流阀，避免反复清缓存反而拖慢系统。<b>手动点按钮不受此限制。</b></li>
+</ul>
+
+<h3 id="ch2-4">设置页</h3>
+<ul>
+  <li><b>开机自启</b>：管理员运行时写计划任务（最高权限、免 UAC）；普通权限自动退回登录项，同样不弹 UAC。</li>
+  <li><b>关闭窗口时最小化到托盘</b>：默认开，双击托盘图标恢复，右键退出。</li>
+  <li><b>加速时清理临时文件</b>：只删 7 天前的，避免误删正在用的文件。</li>
+  <li><b>后台检测间隔</b>：5~120 秒步进，越小越灵敏。</li>
+  <li><b>深浅色切换</b>、一键退出。</li>
+</ul>
+
+<h2 id="ch3">3. 功能清单</h2>
+<ul>
+  <li><b>一键加速</b>：修剪工作集 + 清备用列表 + 清临时文件，三步一次做完。</li>
+  <li><b>阈值自动加速</b>：按 GB 或按百分比，后台线程轮询。</li>
+  <li><b>节流保护</b>：自动加速默认 300 秒内最多一次。</li>
+  <li><b>开机自启</b>：优先计划任务（最高权限），不可用时自动降级为 HKCU 登录项，两种都不弹 UAC。</li>
+  <li><b>托盘常驻</b>：关闭窗口不退出，托盘双击恢复 / 右键退出。</li>
+  <li><b>CLI 兜底</b>：没有界面也能 <code>--once</code> / <code>--auto</code> 跑。</li>
+  <li><b>高 DPI 适配</b>：按系统 DPI 缩放坐标与线宽，不糊、不裁切。</li>
+</ul>
+
+<h2 id="ch4">4. 运行方式</h2>
+<p>推荐直接用打包好的 <code>dist\MemoryBooster.exe</code>：双击即可，无需 Python。配置文件 <code>memory_booster_config.json</code> 会自动生成在 exe 同目录。</p>
+
+<h3 id="ch4-1">EXE 模式（推荐）</h3>
+<pre><code class="lang-bash"># 双击运行，或命令行启动
+dist\MemoryBooster.exe
+
+# 开机自启用的静默模式：直接进托盘
+dist\MemoryBooster.exe --tray</code></pre>
+
+<div class="box warn">
+  <div class="bt">首次运行请右键 → 以管理员身份运行</div>
+  非管理员时：清空备用列表（清缓存）会失败，跨会话的系统进程工作集修剪不了，加速效果会打折。<b>开机自启不受影响</b>——会改用普通权限的登录项。
+</div>
+
+<h3 id="ch4-2">源码运行</h3>
+<pre><code class="lang-bash"># 只依赖标准库（tkinter 一般随 Python 自带）
+py -3.10 memory_booster.py</code></pre>
+
+<h3 id="ch4-3">CLI 模式（无界面 / 计划任务）</h3>
+<pre><code class="lang-bash"># 立即执行一次加速后退出，并打印结果
+py -3.10 memory_booster.py --once
+
+# 常驻：按 GB 阈值自动加速，每 20 秒检查、最小间隔 5 分钟
+py -3.10 memory_booster.py --auto --threshold-gb 12 --check-interval 20 --min-interval 300
+
+# 按占用率阈值
+py -3.10 memory_booster.py --auto --threshold-percent 85</code></pre>
+
+<h3 id="ch4-4">开机自启是怎么做的</h3>
+<p>自启本身<b>不需要管理员权限</b>，需要管理员的只是「免 UAC 以管理员身份启动」这一种组合。程序按当前权限自动选路：</p>
+<div class="tw"><table>
+<thead><tr><th>身份</th><th>用的方式</th><th>启动后权限</th><th>弹 UAC</th></tr></thead>
+<tbody>
+<tr><td>管理员</td><td>计划任务 <code>MemoryBooster_Autostart</code></td><td>管理员</td><td>不弹</td></tr>
+<tr><td>普通用户</td><td><code>HKCU\...\Run</code> 登录项 <code>MemoryBooster</code></td><td>普通</td><td>不弹</td></tr>
+</tbody>
+</table></div>
+<pre><code class="lang-bash"># 管理员：任务计划程序
+schtasks /Create /TN MemoryBooster_Autostart /TR "\"C:\path\MemoryBooster.exe\" --tray" /SC ONLOGON /RL HIGHEST /F
+
+# 普通用户：注册表登录项（等价于写 HKCU 的这一条）
+reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Run" /v MemoryBooster /t REG_SZ ^
+  /d "\"C:\path\MemoryBooster.exe\" --tray" /f</code></pre>
+<p>计划任务创建失败时（组策略禁用任务计划等）也会自动退回登录项，不会直接报错。取消勾选会把两条路都收干净；只有「删除管理员建的计划任务」这一步仍然需要管理员，遇到时会提示提权重启。</p>
+<p>两处存的都是<b>绝对路径</b>，把 exe 移动位置后需要重新勾选一次。</p>
+
+<h2 id="ch5">5. 配置项说明</h2>
+<p>界面里的改动会自动写入 <code>memory_booster_config.json</code>（防抖 500ms），也可以直接编辑该文件后重启程序。CLI 的 <code>--threshold-*</code> / <code>--min-interval</code> / <code>--check-interval</code> 只在该次运行生效，不落盘。</p>
+
+<div class="tw"><table>
+<thead><tr><th>配置项</th><th>含义</th><th>默认值</th><th>说明</th></tr></thead>
+<tbody>
+<tr><td><code>auto_enabled</code></td><td>是否启用自动加速</td><td><code>false</code></td><td>自动页的总开关</td></tr>
+<tr><td><code>threshold_mode</code></td><td>阈值类型</td><td><code>"gb"</code></td><td><code>"gb"</code> 或 <code>"percent"</code></td></tr>
+<tr><td><code>threshold_gb</code></td><td>已用超过多少 GB 触发</td><td><code>12.0</code></td><td>mode=gb 时生效</td></tr>
+<tr><td><code>threshold_percent</code></td><td>占用率超过多少 % 触发</td><td><code>85.0</code></td><td>mode=percent 时生效</td></tr>
+<tr><td><code>check_interval_seconds</code></td><td>后台轮询间隔</td><td><code>15</code></td><td>≥2，界面 5~120 步进</td></tr>
+<tr><td><code>min_boost_interval_seconds</code></td><td>自动加速最小间隔</td><td><code>300</code></td><td><b>5 分钟最多一次</b>（≥60）</td></tr>
+<tr><td><code>clean_temp</code></td><td>加速时是否清临时文件</td><td><code>true</code></td><td>设置页可关</td></tr>
+<tr><td><code>temp_max_age_days</code></td><td>清几天前的临时文件</td><td><code>7</code></td><td>保守，避免误删</td></tr>
+<tr><td><code>minimize_to_tray</code></td><td>关闭窗口时最小化到托盘</td><td><code>true</code></td><td>关掉则关闭即退出</td></tr>
+<tr><td><code>appearance</code></td><td>配色</td><td><code>"light"</code></td><td><code>"light"</code> / <code>"dark"</code></td></tr>
+</tbody>
+</table></div>
+
+<pre><code class="lang-json">{
+  "auto_enabled": true,
+  "threshold_mode": "percent",
+  "threshold_percent": 85.0,
+  "min_boost_interval_seconds": 300,
+  "check_interval_seconds": 15,
+  "clean_temp": true,
+  "minimize_to_tray": true,
+  "appearance": "light"
+}</code></pre>
+
+<h2 id="ch6">6. 体积：从 25.8 MB 压到 6.9 MB</h2>
+<p>v1 用 customtkinter 做界面，单文件 exe 有 <b>25.8 MB</b>。v2 改成纯 tkinter 自绘（所有卡片、圆环、开关、滑块都是 Canvas 画的），并裁掉 Tcl/Tk 里用不到的运行时数据：</p>
+
+<div class="tw"><table>
+<thead><tr><th>版本</th><th>界面方案</th><th>体积</th><th>变化</th></tr></thead>
+<tbody>
+<tr><td>v1</td><td>customtkinter 5.2</td><td>25.76 MB</td><td>—</td></tr>
+<tr><td>v2</td><td>纯 tkinter Canvas 自绘</td><td>7.39 MB</td><td>-71.3%</td></tr>
+<tr><td><b>v2.1</b></td><td>内嵌图标 + 去掉 <code>tempfile</code> 依赖</td><td><b>6.91 MB</b></td><td><b>-73.2%</b></td></tr>
+</tbody>
+</table></div>
+
+<p>瘦身来自四件事：① 去掉 customtkinter 及其依赖；② 删除 <code>tcl/tzdata</code>（几百个时区文件）、<code>msgs</code>（本地化消息）、<code>tk/demos</code>、<code>tk/images</code>；③ 排除 numpy / PIL / setuptools / sqlite3 / unittest 等未被引用的模块；④ 图标压成 zlib+base64 直接放进 <code>app_icon.py</code>，不再携带独立资源文件；⑤ 去掉 <code>tempfile</code> 依赖（它会顺带拉进 <code>shutil</code> / <code>bz2</code> / <code>lzma</code> 约 1.5 MB）。</p>
+
+<pre><code class="lang-python"># MemoryBooster.spec 关键片段
+DROP = ("_tcl_data\\tzdata", "_tcl_data\\msgs",
+        "_tk_data\\msgs", "_tk_data\\demos", "_tk_data\\images")
+
+a = Analysis(["memory_booster.py"],
+             datas=[("assets/icon.ico", ".")],
+             excludes=["numpy", "PIL", "setuptools", "sqlite3", "unittest",
+                       "customtkinter", "email", "http", "multiprocessing"],
+             noarchive=False)
+a.datas = [d for d in a.datas
+           if not any(d[0].lower().startswith(p) for p in DROP)]
+
+exe = EXE(PYZ(a.pure), a.scripts, a.binaries, a.datas, [],
+          name="MemoryBooster", console=False, icon="assets/icon.ico")</code></pre>
+
+<pre><code class="lang-bash"># 重新打包
+py -3.10 -m PyInstaller --noconfirm --clean MemoryBooster.spec</code></pre>
+
+<div class="box tip">
+  <div class="bt">首次启动会慢 1~2 秒</div>
+  onefile 需要把内容解压到临时目录；之后系统有缓存就快了。想要秒开可以改成 <code>--onedir</code>，代价是一个文件夹而不是单文件。
+</div>
+
+<h2 id="ch7">7. 局限与 NPP 泄漏排查</h2>
+<p>本工具能动的只有两块内存：<b>备用/缓存列表</b>（Standby List）和<b>用户态进程的工作集</b>。下面这些它一概动不了：</p>
+<ul>
+  <li><b>非分页池（Non-Paged Pool）</b>：内核态内存，用户态 API 碰不到。</li>
+  <li><b>分页池 / 驱动占用的内存</b>：同上。</li>
+  <li><b>正在活跃使用的内存</b>：修剪只是把「暂时不用」的部分换出，活跃页不会动。</li>
+</ul>
+<p>如果任务管理器里「已用内存」远大于所有进程之和，或 RAMMap 显示 Nonpaged Pool 异常大（如几个 GB），按下面顺序查：</p>
+<pre><code class="lang-bash"># 1) 看谁在占：RAMMap 打开后用 "Use Counts" / "Physical Pages" 排序
+# 2) 定位驱动：poolmon 按 tag 排序，找只增不减的 tag
+poolmon -b -n MemoryBooster.log
+
+# 3) 用 tag 反查驱动（需要 WDK 的 pooltag.txt，或用 strings 搜 .sys）
+findstr /m /c:"TagName" C:\Windows\System32\drivers\*.sys</code></pre>
+<div class="box warn">
+  <div class="bt">别指望"加速"解决 NPP 泄漏</div>
+  微软电脑管家同样救不了 NPP 泄漏——它用的也是这几个用户态 API。真正的根治办法是找到泄漏的驱动并升级/卸载，或者重启。
+</div>
+
+<h2 id="ch8">8. 常见问题</h2>
+<div class="tw"><table>
+<thead><tr><th>现象</th><th>原因 / 处理</th></tr></thead>
+<tbody>
+<tr><td>点了加速，数字几乎没降</td><td>内存本来就在活跃使用，没有可修剪的部分。这属正常，不代表工具失效。</td></tr>
+<tr><td>「清缓存失败」</td><td>没用管理员身份运行。右键 exe → 以管理员身份运行。</td></tr>
+<tr><td>勾了开机自启但没生效</td><td>先看程序是否把开关记成了「已开启」（下次启动会自动读回来）。若以普通权限勾选，走的是 HKCU 登录项，登录后以普通权限运行——这是正常的，不是失败。另外 exe 移动位置后要重新勾选一次（存的是绝对路径）。</td></tr>
+<tr><td>托盘图标不见了</td><td>Windows 会把新图标收进「隐藏的图标」里，拖到任务栏常显即可；托盘注册失败时程序会自动改为普通最小化。</td></tr>
+<tr><td>窗口跑到屏幕外</td><td>换过显示器/分辨率后右下角坐标变化，双击托盘图标恢复会自动重新定位。</td></tr>
+<tr><td>杀软报毒</td><td>PyInstaller 打包的无签名 exe 常见误报。可自行用本仓库源码 <code>pyinstaller MemoryBooster.spec</code> 重新打包。</td></tr>
+</tbody>
+</table></div>
+
+<h3 id="ch8-1">验收清单</h3>
+<ul class="check">
+  <li>以管理员身份运行，界面右上角徽标显示「管理员」</li>
+  <li>点「一键加速」，圆环有旋转动效，结束后弹出「已释放 X GB」</li>
+  <li>自动页打开开关、设个较低阈值（如占 60%），等 15~20 秒看是否自动触发</li>
+  <li>设置页勾「开机自启」，注销后重新登录确认托盘里有图标</li>
+  <li>关闭窗口 → 进托盘；双击图标恢复，且位置仍在右下角</li>
+</ul>
+
+<p style="margin-top:30px;color:var(--dim);font-size:13px">文件：<code>memory_booster.py</code>（主程序）· <code>app_icon.py</code>（内嵌图标数据，运行时唯一图标来源）· <code>MemoryBooster.spec</code>（打包配置）· <code>make_icon.py</code> + <code>assets/icon.ico</code>（图标源文件，仅重新生成时用）· <code>memory_booster_config.json</code>（自动生成配置）· 本说明 <code>memory_booster.html</code></p>
+
+</main>
+</div>
+<script>
+var KW = {
+  cypher: ['MATCH','OPTIONAL','WHERE','RETURN','CREATE','MERGE','SET','DELETE','DETACH',
+    'REMOVE','WITH','UNWIND','ORDER','BY','LIMIT','SKIP','AS','AND','OR','NOT','IN','IS',
+    'NULL','DISTINCT','CALL','YIELD','UNION','ALL','COUNT','COLLECT','EXISTS','FOREACH',
+    'CASE','WHEN','THEN','ELSE','END','ASC','DESC','ON','INDEX','CONSTRAINT','FOR','EACH',
+    'CONTAINS','STARTS','ENDS','SHORTESTPATH','NODES','LENGTH','COALESCE','TOLOWER','TOUPPER',
+    'LOAD','CSV','USING','PERIODIC','COMMIT','TRUE','FALSE','USER','ROLE','GRANT','GRAPH',
+    'RELATIONSHIPS','PASSWORD','ALTER','CURRENT','FROM','TO','REQUIRED','CHANGE','EXPLAIN',
+    'NODE','KEY','FULLTEXT','QUERYNODES','RELATIONSHIP','PROFILE'],
+  python: ['def','class','return','import','from','as','if','elif','else','for','while','try',
+    'except','finally','raise','with','in','not','and','or','is','None','True','False','lambda',
+    'yield','async','await','pass','break','continue','global','assert','del','print'],
+  bash: ['docker','git','cd','cp','mv','rm','curl','pip','python','uvicorn','source','export',
+    'compose','run','logs','ps','up','down','restart','stop','start','echo','mkdir','sudo',
+    'npm','npx','node','apt','brew','activate','venv','clone','install','env','version',
+    'if','then','fi','for','do','done','which','ls','cat','tail','grep','set'],
+  json: ['true','false','null']
+};
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function highlight(code, lang){
+  if(lang==='prompt'||lang==='var'||lang==='text'){
+    return esc(code).replace(/\{\{#([^#]*)#\}\}/g,function(m,inner){return '{{<span class="a">#'+inner+'#</span>}}';});
+  }
+  var store=[];
+  function stash(html){store.push(html);return String.fromCharCode(0xE000+store.length-1);}
+  var text=code;
+  var cm=(lang==='python'||lang==='bash')?'#':'//';
+  text=text.split('\n').map(function(line){
+    return line.trim().indexOf(cm)===0?stash('<span class="c">'+esc(line)+'</span>'):line;
+  }).join('\n');
+  text=text.replace(/"""[\s\S]*?"""|'''[\s\S]*?'''|"[^"\n]*"|'[^'\n]*'|`[^`\n]*`/g,function(m){
+    return stash('<span class="s">'+esc(m)+'</span>');
+  });
+  text=text.replace(cm==='#'?/(#.*)$/gm:/(\/\/.*)$/gm,function(m){
+    return stash('<span class="c">'+esc(m)+'</span>');
+  });
+  var kws=KW[lang]||[];
+  if(kws.length){
+    text=text.replace(new RegExp('\\b('+kws.join('|')+')\\b','g'),function(m){
+      return stash('<span class="k">'+m+'</span>');
+    });
+  }
+  if(lang==='cypher'){
+    text=text.replace(/\$[A-Za-z_]\w*/g,function(m){return stash('<span class="a">'+m+'</span>');});
+    text=text.replace(/:(\s*)([A-Z][A-Za-z_]*)/g,function(m,sp,label){return ':'+sp+stash('<span class="l">'+label+'</span>');});
+  }
+  text=text.replace(/\b\d+(?:\.\d+)?\b/g,function(m){return stash('<span class="n">'+m+'</span>');});
+  text=esc(text);
+  var prev,guard=0;
+  do{prev=text;text=text.replace(/[\uE000-\uF8FF]/g,function(ch){var i=ch.charCodeAt(0)-0xE000;return store[i]!==undefined?store[i]:ch;});guard++;}while(text!==prev&&guard<12);
+  return text;
+}
+Array.prototype.forEach.call(document.querySelectorAll('pre'),function(pre){
+  var code=pre.querySelector('code');if(!code)return;
+  var lang='bash';var m=(code.className||'').match(/lang-([\w-]+)/);if(m)lang=m[1];
+  var raw=code.textContent;code.innerHTML=highlight(raw,lang);
+  var wrap=document.createElement('div');wrap.className='code-wrap';
+  pre.parentNode.insertBefore(wrap,pre);wrap.appendChild(pre);
+  var btn=document.createElement('button');btn.className='copy';btn.type='button';btn.textContent='复制';
+  btn.addEventListener('click',function(){
+    var done=function(){btn.textContent='已复制';setTimeout(function(){btn.textContent='复制';},1600);};
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(raw).then(done,done);}
+    else{var ta=document.createElement('textarea');ta.value=raw;document.body.appendChild(ta);ta.select();
+      try{document.execCommand('copy');}catch(e){}document.body.removeChild(ta);done();}
+  });
+  wrap.appendChild(btn);
+});
+var toc=document.getElementById('toc');
+var heads=document.querySelectorAll('#main h2,#main h3');
+var links=[];
+Array.prototype.forEach.call(heads,function(h){
+  if(!h.id)return;
+  var a=document.createElement('a');a.href='#'+h.id;a.textContent=h.textContent;
+  if(h.tagName==='H3')a.className='lv3';
+  toc.appendChild(a);links.push(a);
+});
+var targets=links.map(function(a){return document.querySelector(a.getAttribute('href'));});
+function spy(){
+  var y=window.pageYOffset+130,idx=0;
+  for(var i=0;i<targets.length;i++){if(targets[i]&&targets[i].offsetTop<=y)idx=i;}
+  links.forEach(function(a,i){a.classList.toggle('active',i===idx);});
+}
+window.addEventListener('scroll',spy,{passive:true});spy();
+</script>
+</body>
+</html>

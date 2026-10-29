@@ -1,0 +1,24 @@
+# 构建产物
+build/
+dist/
+*.spec.bak
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# 本地配置与日志
+config.json
+memory_booster_config.json
+*.log
+
+# 开发过程中的临时截图：只保留 README 引用的两张
+shots/*
+!shots/result_protected.png
+!shots/auto_setting_on.png
+
+# WorkBuddy 项目内部数据（记忆/会话）
+.workbuddy/
